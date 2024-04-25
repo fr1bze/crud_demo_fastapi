@@ -1,5 +1,5 @@
-from src.repositories.user_repository import UserRepository
-from src.services.user_service import UserService
+from repositories.user_repository import UserRepository
+from services.user_service import UserService
 
 user_repository = UserRepository()
 

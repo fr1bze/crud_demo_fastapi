@@ -1,14 +1,8 @@
-# from sqlalchemy import Session
-# from .. import repositories, schemas
-
-# def get_user(db: Session, user_id: int):
-#     return repositories.get_user(db=db, user_id=user_id)
-# def create_user(db: Session, user: schemas.):    
-from pydantic import BaseModel
+from pydantic import BaseModel, Emailstr
 
 class UserBase(BaseModel):
     username: str
-    email: str
+    email: Emailstr
 
 class UserCreate(UserBase):
     password: str
