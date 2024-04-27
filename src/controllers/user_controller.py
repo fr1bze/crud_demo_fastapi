@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, Path, HTTPException
 from pydantic import Field
 from typing import List
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from ..depends import get_user_service
 from ..schemas.user_schema import User, UserCreate
 from ..services.user_service import UserService
-from ..database import SessionLocal, get_db, UserModel, pwd_context
+from ..database import async_session_maker, get_users_db, UserModel, pwd_context
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -17,7 +19,7 @@ router = APIRouter(prefix="/users", tags=["users"])
     description="Listing of all users"
 )
 async def get_all_users(
-        session: Session = Depends(get_db),
+        session: AsyncSession = Depends(get_users_db),
         user_service: UserService = Depends(get_user_service)
 ) -> List[User]:
     users = await user_service.get_users(session)
@@ -33,7 +35,7 @@ async def get_all_users(
     description="Listing of all users"
 )
 async def get_user(user_id: int,
-                   session: Session = Depends(get_db),
+                   session: AsyncSession = Depends(get_users_db),
                    user_service: UserService = Depends(get_user_service)
                    ) -> User:
     user = await user_service.get_user(user_id, session)
@@ -48,7 +50,7 @@ async def get_user(user_id: int,
 )
 async def create_user(
     request: UserCreate,
-    session: Session = Depends(get_db),
+    session: AsyncSession = Depends(get_users_db),
     user_service: UserService = Depends(get_user_service)
 ) -> User:
     user = await user_service.create_user(request.name, request.email, request.password, session)
@@ -61,11 +63,11 @@ async def create_user(
 )
 async def delete_user(
         user_id: int,
-        session: Session = Depends(get_db),
+        session: AsyncSession = Depends(get_users_db),
         user_service: UserService = Depends(get_user_service)
         ) -> User:
     user = await user_service.get_user(user_id, session)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    user_service.delete_user(user_id, session)
+    await user_service.delete_user(user_id, session)
     return user

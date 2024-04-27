@@ -1,27 +1,13 @@
-from typing import Optional
-from pydantic import BaseModel, constr
-from pydantic.v1 import validator
+from fastapi_users import schemas
 
 
-class UserBase(BaseModel):
+class User(schemas.BaseUser[int]):
     name: str
-    email: str
 
 
-class UserCreate(BaseModel):
+class UserCreate(schemas.BaseUserCreate):
     name: str
-    email: constr(pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$')
-    password: constr(min_length=8)
-
-    @validator('password')
-    def password_length(cls, v):
-        if len(v) < 8:
-            raise ValueError("Password must be at least 8 characters length")
-        return v
 
 
-class User(UserBase):
-    id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
+class UserUpdate(schemas.BaseUserUpdate):
+    pass
