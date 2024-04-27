@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import List
 from pydantic import EmailStr
-from ..schemas.user_schema import User
+from ..schemas.user_schema import User, UserCreate
 from ..database import UserModel
 
 
@@ -12,8 +12,9 @@ class UserRepository:
     def get_users(self, session: Session) -> List[User]:
         return session.query(UserModel).all()
 
-    def create_user(self, name: str, email: EmailStr, session: Session) -> User:
+    def create_user(self, name: str, email: EmailStr, password: str, session: Session) -> User:
         db_user = UserModel(name=name, email=email)
+        db_user.hashed_password = db_user.get_password_hash(password)
         session.add(db_user)
         session.commit()
         session.refresh(db_user)

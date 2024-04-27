@@ -16,8 +16,8 @@ class UserService:
     async def get_user(self, user_id: int, session: Session) -> User:
         return self.repository.get_user(user_id, session)
 
-    async def create_user(self, name: str, email: str, session: Session) -> User:
-        return self.repository.create_user(name, email, session)
+    async def create_user(self, name: str, email: str, password: str, session: Session) -> User:
+        return self.repository.create_user(name, email, password, session)
 
     async def delete_user(self, user_id: int, session: Session) -> User:
         return self.repository.delete_user(user_id,session)

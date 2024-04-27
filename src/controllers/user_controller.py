@@ -3,9 +3,9 @@ from pydantic import Field
 from typing import List
 from sqlalchemy.orm import Session
 from ..depends import get_user_service
-from ..schemas.user_schema import User, CreateUserRequest
+from ..schemas.user_schema import User, UserCreate
 from ..services.user_service import UserService
-from ..database import SessionLocal, get_db
+from ..database import SessionLocal, get_db, UserModel, pwd_context
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -20,7 +20,7 @@ async def get_all_users(
         session: Session = Depends(get_db),
         user_service: UserService = Depends(get_user_service)
 ) -> List[User]:
-    users = user_service.get_users(session)
+    users = await user_service.get_users(session)
     if not users:
         return []
     return users
@@ -47,11 +47,11 @@ async def get_user(user_id: int,
     description="Create a new user",
 )
 async def create_user(
-    request: CreateUserRequest,
+    request: UserCreate,
     session: Session = Depends(get_db),
     user_service: UserService = Depends(get_user_service)
 ) -> User:
-    user = await user_service.create_user(request.name, request.email, session)
+    user = await user_service.create_user(request.name, request.email, request.password, session)
     return user
 
 @router.delete(
