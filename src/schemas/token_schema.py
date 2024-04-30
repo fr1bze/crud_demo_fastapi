@@ -11,6 +11,7 @@ class requestdetails(BaseModel):
 class TokenSchema(BaseModel):
     access_token: str
     refresh_token: str
+    message: str
 
 
 class changepassword(BaseModel):

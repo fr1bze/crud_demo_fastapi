@@ -93,7 +93,7 @@ async def get_users_db(session: AsyncSession = Depends(get_async_session)):
         yield async_session
 
 
-cookie_transport = CookieTransport(cookie_path="auth/jwt/login", cookie_max_age=3600)
+cookie_transport = CookieTransport(cookie_path="auth/login", cookie_max_age=3600)
 
 from .rsa_key import generate_rsa_keys
 
