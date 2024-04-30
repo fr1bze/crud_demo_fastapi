@@ -49,12 +49,24 @@ async def get_user(user_id: int,
     description="Create a new user",
 )
 async def create_user(
-    request: UserCreate,
-    session: AsyncSession = Depends(get_users_db),
-    user_service: UserService = Depends(get_user_service)
+        request: UserCreate,
+        session: AsyncSession = Depends(get_users_db),
+        user_service: UserService = Depends(get_user_service)
 ) -> User:
-    user = await user_service.create_user(request.name, request.email, request.password, session)
-    return user
+    roles = request.roles
+
+    role = await user_service.get_role_by_name(roles, session)
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+
+    try:
+        user = await user_service.create_user(request.name, request.email, request.password, roles, session)
+
+        await user_service.assign_role_to_user(user.id, role.id, session)
+
+        return user
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete(
     "/{user_id}",
